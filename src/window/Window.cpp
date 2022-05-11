@@ -6,6 +6,8 @@
 
 GLFWwindow* Window::window;
 
+int Window::width, Window::height;
+
 unsigned short Window::fpsLock;
 double Window::lastTime = 0;
 
@@ -26,8 +28,12 @@ int Window::initialization(int width, int height, const char* title, unsigned sh
         return -1;
     }
 
+    Window::width = width;
+    Window::height = height;
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
+    glfwSetWindowSizeCallback(window, winSizeCallBack);
 
     if(!gladLoadGL()){
         std::cout << "GLAD initialization failed.\n";
@@ -60,4 +66,10 @@ void Window::fpsLimit() {
 
 void Window::terminate() {
     glfwTerminate();
+}
+
+void Window::winSizeCallBack(GLFWwindow* window, int width, int height) {
+    Window::width = width;
+    Window::height = height;
+    glViewport(0, 0, width, height);
 }
