@@ -28,11 +28,10 @@ int Window::initialization(int width, int height, const char* title, unsigned sh
         return -1;
     }
 
-    Window::width = width;
-    Window::height = height;
-
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0);
+    Window::width = width;
+    Window::height = height;
     glfwSetWindowSizeCallback(window, winSizeCallBack);
 
     if(!gladLoadGL()){
@@ -42,14 +41,25 @@ int Window::initialization(int width, int height, const char* title, unsigned sh
     } 
     
     glEnable(GL_DEPTH_TEST);
+    
 
     Window::fpsLock = fpsLock;
 
     return 0;
 }
 
-int Window::winShouldClose() {
+int Window::getWidth() {
+    return width;
+}
+int Window::getHeight() {
+    return height;
+}
+
+int Window::ShouldClose() {
     return glfwWindowShouldClose(window);
+}
+void Window::ShouldClose(bool value) {
+    glfwSetWindowShouldClose(window, true);
 }
 
 void Window::swapBuffers() {

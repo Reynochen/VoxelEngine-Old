@@ -5,6 +5,7 @@
 
 #include <string>
 #include <fstream>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 
@@ -17,6 +18,10 @@ Shader::~Shader() {
 
 void Shader::use() {
     glUseProgram(id);
+}
+
+void Shader::setMatrix(const char* name, glm::mat4 matrix) {
+    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 Shader* loadShader(const char* PathVertShader, const char* PathFragShader) {
