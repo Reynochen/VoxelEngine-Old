@@ -16,14 +16,62 @@
 #include "Camera.hpp"
 
 float vertices[] {
-    -0.5f, -0.5f, 0.0f,     0, 0,
-    0.5f, -0.5f, 0.0f,      1, 0,
-    -0.5f, 0.5f, 0.0f,      0, 1,
+    //+X
+    0.5f,   0.5f,  -0.5f,       1, 1,
+    0.5f,   -0.5f, -0.5f,       1, 0,
+    0.5f,   -0.5f,  0.5f,       0, 0,
 
-    -0.5f, 0.5f, 0.0f,      0, 1,
-    0.5f, -0.5f, 0.0f,      1, 0,
-    0.5f, 0.5f, 0.0f,       1, 1,
+    0.5f,   -0.5f,  0.5f,       0, 0,
+    0.5f,   0.5f,   0.5f,       0, 1,
+    0.5f,   0.5f,  -0.5f,       1, 1,
+
+    //+Z
+    0.5f,   0.5f,   0.5f,       1, 1,
+    0.5f,   -0.5f,  0.5f,       1, 0,
+    -0.5f,  -0.5f,  0.5f,       0, 0,
+
+    -0.5f,  -0.5f,  0.5f,       0, 0,
+    -0.5f,  0.5f,   0.5f,       0, 1,
+    0.5f,   0.5f,   0.5f,       1, 1,
+
+    //+Y
+    0.5f,   0.5f,  -0.5f,       1, 1,
+    0.5f,   0.5f,  0.5f,        1, 0,
+    -0.5f,  0.5f,  0.5f,        0, 0,
+
+    -0.5f,  0.5f,  0.5f,        0, 0,
+    -0.5f,  0.5f,  -0.5f,       0, 1,
+    0.5f,   0.5f,  -0.5f,       1, 1,
+
+    //-X
+    -0.5f,   -0.5f,  0.5f,       1, 1,
+    -0.5f,   -0.5f, -0.5f,       1, 0,
+    -0.5f,   0.5f,  -0.5f,       0, 0,
+
+    -0.5f,   0.5f,  -0.5f,       0, 0,
+    -0.5f,   0.5f,   0.5f,       0, 1,
+    -0.5f,   -0.5f,  0.5f,       1, 1,
+
+    //-Z
+    -0.5f,  -0.5f,   -0.5f,      1, 1,
+    0.5f,   -0.5f,  -0.5f,       1, 0,
+    0.5f,   0.5f,  -0.5f,        0, 0,
+
+    0.5f,   0.5f,  -0.5f,        0, 0,
+    -0.5f,  0.5f,   -0.5f,       0, 1,
+    -0.5f,  -0.5f,   -0.5f,      1, 1,
+
+    //-Y
+    -0.5f,   -0.5f,  0.5f,       1, 1,
+    0.5f,   -0.5f,  0.5f,        1, 0,
+    0.5f,  -0.5f,  -0.5f,        0, 0,
+
+    0.5f,  -0.5f,  -0.5f,        0, 0,
+    -0.5f,  -0.5f,  -0.5f,       0, 1,
+    -0.5f,   -0.5f,  0.5f,       1, 1,
 };
+
+int elements[] {};
 
 int attrs[] {3,2, 0};
 
@@ -32,11 +80,13 @@ int main() {
     Window::initialization(800, 600, "Voxel Engine", 0);
     Events::initialization(Window::window);
     
-    Mesh mesh(vertices, 6, attrs);
+    Mesh mesh(vertices, 36, attrs);
     Shader* shader = loadShader("../res/Shaders/main.vs", "../res/Shaders/main.fs");
     Texture* texture = loadTexture("dirt.png");
     
-    Camera camera(glm::vec3(0,0,-3));
+    Camera camera(glm::vec3(0,0,3));
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
 
     glm::mat4 model(1.0f);
     glm::mat4 view(1.0f);
@@ -50,7 +100,7 @@ int main() {
 
         if(Events::jpressed(GLFW_KEY_ESCAPE))
             Window::ShouldClose(true);
-
+        
         shader->use();
         shader->setMatrix("model", model);
         shader->setMatrix("view", view);

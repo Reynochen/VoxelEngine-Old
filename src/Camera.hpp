@@ -5,11 +5,11 @@
 #include <glm/mat4x4.hpp>
 
 #define FOV 80.0f
-#define YAW 90.0f
+#define YAW -90.0f
 #define PITCH 0.0f
 
-#define SENSITIVITY 0.15f
-#define SPEED 6.0f
+#define SENSITIVITY 0.1f
+#define SPEED 6.5f
 
 class Shader;
 

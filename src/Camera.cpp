@@ -36,13 +36,21 @@ void Camera::update() {
 
     right = glm::normalize(glm::cross(front, worldUp));
     up = glm::normalize(glm::cross(right, front));
+    
     //Control move
+    glm::vec3 dirMove = glm::vec3(cos(glm::radians(yaw)), 0.0f, sin(glm::radians(yaw)));
+
     if(Events::pressed(GLFW_KEY_W))
-        pos += front * speed * Events::getDeltaTime();
+        pos += dirMove * speed * Events::getDeltaTime();
     if(Events::pressed(GLFW_KEY_S))
-        pos -= front * speed * Events::getDeltaTime();
+        pos -= dirMove * speed * Events::getDeltaTime();
     if(Events::pressed(GLFW_KEY_A))
-        pos -= glm::normalize(glm::cross(front, up)) * speed * Events::getDeltaTime();
+        pos -= glm::normalize(glm::cross(dirMove, up)) * speed * Events::getDeltaTime();
     if(Events::pressed(GLFW_KEY_D))
-        pos += glm::normalize(glm::cross(front, up)) * speed * Events::getDeltaTime();
+        pos += glm::normalize(glm::cross(dirMove, up)) * speed * Events::getDeltaTime();
+
+    if(Events::pressed(GLFW_KEY_SPACE))
+        pos += worldUp * speed * Events::getDeltaTime();
+    if(Events::pressed(GLFW_KEY_LEFT_SHIFT))
+        pos -= worldUp * speed * Events::getDeltaTime();
 }
