@@ -13,78 +13,54 @@
 #include "graphics/Shader.hpp"
 #include "graphics/Texture.hpp"
 
+#include "Voxels/Chunk/Chunk.hpp"
+#include "Voxels/VoxRenderer.hpp"
+#include "Voxels/Chunk/Chunks.hpp"
+
 #include "Camera.hpp"
-
-float vertices[] {
-    //+X
-    0.5f,   0.5f,  -0.5f,       1, 1,
-    0.5f,   -0.5f, -0.5f,       1, 0,
-    0.5f,   -0.5f,  0.5f,       0, 0,
-
-    0.5f,   -0.5f,  0.5f,       0, 0,
-    0.5f,   0.5f,   0.5f,       0, 1,
-    0.5f,   0.5f,  -0.5f,       1, 1,
-
-    //+Z
-    0.5f,   0.5f,   0.5f,       1, 1,
-    0.5f,   -0.5f,  0.5f,       1, 0,
-    -0.5f,  -0.5f,  0.5f,       0, 0,
-
-    -0.5f,  -0.5f,  0.5f,       0, 0,
-    -0.5f,  0.5f,   0.5f,       0, 1,
-    0.5f,   0.5f,   0.5f,       1, 1,
-
-    //+Y
-    0.5f,   0.5f,  -0.5f,       1, 1,
-    0.5f,   0.5f,  0.5f,        1, 0,
-    -0.5f,  0.5f,  0.5f,        0, 0,
-
-    -0.5f,  0.5f,  0.5f,        0, 0,
-    -0.5f,  0.5f,  -0.5f,       0, 1,
-    0.5f,   0.5f,  -0.5f,       1, 1,
-
-    //-X
-    -0.5f,   -0.5f,  0.5f,       1, 1,
-    -0.5f,   -0.5f, -0.5f,       1, 0,
-    -0.5f,   0.5f,  -0.5f,       0, 0,
-
-    -0.5f,   0.5f,  -0.5f,       0, 0,
-    -0.5f,   0.5f,   0.5f,       0, 1,
-    -0.5f,   -0.5f,  0.5f,       1, 1,
-
-    //-Z
-    -0.5f,  -0.5f,   -0.5f,      1, 1,
-    0.5f,   -0.5f,  -0.5f,       1, 0,
-    0.5f,   0.5f,  -0.5f,        0, 0,
-
-    0.5f,   0.5f,  -0.5f,        0, 0,
-    -0.5f,  0.5f,   -0.5f,       0, 1,
-    -0.5f,  -0.5f,   -0.5f,      1, 1,
-
-    //-Y
-    -0.5f,   -0.5f,  0.5f,       1, 1,
-    0.5f,   -0.5f,  0.5f,        1, 0,
-    0.5f,  -0.5f,  -0.5f,        0, 0,
-
-    0.5f,  -0.5f,  -0.5f,        0, 0,
-    -0.5f,  -0.5f,  -0.5f,       0, 1,
-    -0.5f,   -0.5f,  0.5f,       1, 1,
-};
-
-int elements[] {};
-
-int attrs[] {3,2, 0};
 
 int main() {
     
     Window::initialization(800, 600, "Voxel Engine", 0);
     Events::initialization(Window::window);
-    
-    Mesh mesh(vertices, 36, attrs);
+
+    Camera camera(glm::vec3(0,0,0));
+
+    Chunks* chunks = new Chunks(3, 3, 3);
+
+    Mesh** meshes = new Mesh*[chunks->volume];
+    VoxRenderer renderer(1024 * 1024);
+
+    Chunk* closes[12];
+    for(int i = 0; i < chunks->volume; i++) {
+        Chunk* chunk = chunks->chunks[i];
+        
+        for (int i = 0; i < 12; i++)
+            closes[i] = nullptr;
+        for (int j = 0; j < chunks->volume; j++) {
+            
+            Chunk* other = chunks->chunks[j];
+            int oX = other->x - chunk->x;
+            int oY = other->y - chunk->y;
+            int oZ = other->z - chunk->z;
+
+
+            if( abs(oX) > 1 || abs(oY) > 1 || abs(oZ) > 1 ||
+                abs(oX) == abs(oZ) && oX != 0 || oX == 0 && oY == 0 && oZ == 0 || oY != 0 && oX != 0 || oY != 0 && oZ != 0) continue;
+                
+            oX++;
+            oY++;
+            oZ++;
+
+            closes[(oY * 2 + oZ) * 2 + oX] = other;
+        }
+        meshes[i] = renderer.render(chunk, closes);
+    }
+
+
     Shader* shader = loadShader("../res/Shaders/main.vs", "../res/Shaders/main.fs");
-    Texture* texture = loadTexture("dirt.png");
+    Texture* texture = loadTexture("../res/Textures/atlas.png");
     
-    Camera camera(glm::vec3(0,0,3));
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
 
@@ -93,9 +69,11 @@ int main() {
     glm::mat4 projection;
 
     glClearColor(0.1f, 0.4f, 0.5f, 1.0f);
+    
     while(!Window::ShouldClose()) {
+
         camera.update();
-        projection = glm::perspective(glm::radians(camera.getFov()), (float)Window::getWidth() / (float)Window::getHeight(), 0.01f, 100.0f);
+        projection = glm::perspective(glm::radians(camera.getFov()), (float)Window::getWidth() / (float)Window::getHeight(), 0.01f, 1024.0f);
         view = camera.getMatrix();
 
         if(Events::jpressed(GLFW_KEY_ESCAPE))
@@ -106,14 +84,23 @@ int main() {
         shader->setMatrix("view", view);
         shader->setMatrix("projection", projection);
         texture->bind();
-        mesh.draw(GL_TRIANGLES);
-        
+        model = glm::mat4(1.0f);
+        for(int i = 0; i < chunks->volume; i++) {
+            Chunk* chunk = chunks->chunks[i];
+            Mesh* mesh = meshes[i];
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(chunk->x * CHUNK_W, chunk->y * CHUNK_H, chunk->z * CHUNK_L));
+            shader->setMatrix("model", model);
+            mesh->draw(GL_TRIANGLES);
+        }
+
         Window::swapBuffers();
         Events::pullEvents();
     }
 
     delete shader;
     delete texture;
+    
 
     Window::terminate();
     return 0;

@@ -9,7 +9,7 @@
 #define PITCH 0.0f
 
 #define SENSITIVITY 0.1f
-#define SPEED 6.5f
+#define SPEED 8.0f
 
 class Shader;
 
