@@ -44,7 +44,6 @@ int main() {
             int oY = other->y - chunk->y;
             int oZ = other->z - chunk->z;
 
-
             if( abs(oX) > 1 || abs(oY) > 1 || abs(oZ) > 1 ||
                 abs(oX) == abs(oZ) && oX != 0 || oX == 0 && oY == 0 && oZ == 0 || oY != 0 && oX != 0 || oY != 0 && oZ != 0) continue;
                 
@@ -56,7 +55,6 @@ int main() {
         }
         meshes[i] = renderer.render(chunk, closes);
     }
-
 
     Shader* shader = loadShader("../res/Shaders/main.vs", "../res/Shaders/main.fs");
     Texture* texture = loadTexture("../res/Textures/atlas.png");
@@ -100,7 +98,10 @@ int main() {
 
     delete shader;
     delete texture;
-    
+    for(int i = 0; i < chunks->volume; i++)
+        delete meshes[i];
+    delete[] meshes;
+    delete chunks;   
 
     Window::terminate();
     return 0;

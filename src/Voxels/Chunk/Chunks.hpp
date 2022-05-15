@@ -13,8 +13,6 @@ public:
     int volume;
     Chunks(int w, int h, int l);
     ~Chunks();
-
-    void update(int PlayerX, int PlayerZ);
 };
 
 
