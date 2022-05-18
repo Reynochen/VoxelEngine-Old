@@ -13,6 +13,9 @@ public:
     int volume;
     Chunks(int w, int h, int l);
     ~Chunks();
+
+    Voxel* getVoxel(glm::vec3 pos);
+    void setVoxel(glm::vec3 pos, int id);
 };
 
 

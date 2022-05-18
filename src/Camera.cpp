@@ -7,9 +7,29 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 
+#include "Voxels/Voxel.hpp"
+#include "Voxels/Chunk/Chunks.hpp"
+
 Camera::Camera( glm::vec3 pos, glm::vec3 worldUp, float fov, float sensitivity, float speed, float yaw, float pitch) :
                 pos(pos), worldUp(worldUp), fov(fov), sensitivity(sensitivity), speed(speed), yaw(yaw), pitch(pitch) {
     update();
+}
+
+bool Camera::rayCast(Chunks* chunks, int distance) {
+    glm::vec3 rayPos(pos.x, pos.y, pos.z);
+    
+     for (int i = 0; i < distance * 8; i++) {
+        if(chunks->getVoxel(rayPos) != nullptr && chunks->getVoxel(rayPos)->id != 0) {
+            chunks->setVoxel(rayPos, 0);
+            return true;
+        }
+        
+        rayPos.x += front.x / 8;
+        rayPos.y += front.y / 8;
+        rayPos.z += front.z / 8;
+    }
+    
+    return false;
 }
 
 float Camera::getFov() {

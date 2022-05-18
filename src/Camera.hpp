@@ -12,6 +12,7 @@
 #define SPEED 8.0f
 
 class Shader;
+class Chunks;
 
 class Camera {
     float fov;
@@ -26,9 +27,9 @@ class Camera {
     glm::vec3 right;
     glm::vec3 worldUp;
     glm::vec3 up;
-    glm::vec3 pos;
 
 public:
+    glm::vec3 pos;
     Camera(glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f), 
     float fov = FOV, float sensitivity = SENSITIVITY, float speed = SPEED, float yaw = YAW, float pitch = PITCH);
 
@@ -36,6 +37,8 @@ public:
 
     float getFov();
     glm::mat4 getMatrix();
+
+    bool rayCast(Chunks* chunks, int distance = 5);
 };
 
 #endif
