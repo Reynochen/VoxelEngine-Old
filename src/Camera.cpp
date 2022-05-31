@@ -10,26 +10,65 @@
 #include "Voxels/Voxel.hpp"
 #include "Voxels/Chunk/Chunks.hpp"
 
+#include <iostream>
+
 Camera::Camera( glm::vec3 pos, glm::vec3 worldUp, float fov, float sensitivity, float speed, float yaw, float pitch) :
                 pos(pos), worldUp(worldUp), fov(fov), sensitivity(sensitivity), speed(speed), yaw(yaw), pitch(pitch) {
     update();
 }
 
-bool Camera::rayCast(Chunks* chunks, int distance) {
-    glm::vec3 rayPos(pos.x, pos.y, pos.z);
-    
-     for (int i = 0; i < distance * 8; i++) {
-        if(chunks->getVoxel(rayPos) != nullptr && chunks->getVoxel(rayPos)->id != 0) {
+
+//https://stackoverflow.com/questions/55263298/draw-all-voxels-that-pass-through-a-3d-line-in-3d-voxel-space
+
+//https://gamedev.stackexchange.com/questions/72120/how-do-i-find-voxels-along-a-ray
+//https://gamedev.stackexchange.com/questions/47362/cast-ray-to-select-block-in-voxel-game?rq=1
+//ÍÀÊÎÍÅÖ ÒÎ ÎÍÎ ÐÀÁÎÒÀÅÒ
+bool Camera::rayCast(Chunks* chunks, int radius) {
+    glm::vec3 startPos(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5);
+
+    glm::vec3 rayPos(startPos);
+    glm::vec3 dir = front;
+
+    glm::vec3 step(dir.x>0 ? 1:-1, dir.y>0 ? 1:-1, dir.z>0 ? 1:-1);
+    glm::vec3 cellBoundary((int)rayPos.x + (step.x>0 ? 1:0), (int)rayPos.y + (step.y>0 ? 1:0), (int)rayPos.z + (step.z>0 ? 1:0));
+
+    glm::vec3 tMax((cellBoundary.x - rayPos.x) / dir.x, (cellBoundary.y - rayPos.y) / dir.y, (cellBoundary.z - rayPos.z) / dir.z);
+    glm::vec3 tDelta(abs(1/dir.x), abs(1/dir.y), abs(1/dir.z));
+
+    float radiusNow = 0.0f;
+    while(radiusNow < radius) {
+        if(chunks->getVoxel(rayPos) == nullptr) return false;
+        if(chunks->getVoxel(rayPos)->id != 0) {
             chunks->setVoxel(rayPos, 0);
             return true;
         }
-        
-        rayPos.x += front.x / 8;
-        rayPos.y += front.y / 8;
-        rayPos.z += front.z / 8;
+        if(tMax.x < tMax.y) {
+            if(tMax.x < tMax.z) {
+                rayPos.x += step.x;
+                radiusNow = tMax.x;
+                tMax.x += tDelta.x;
+            }
+            else {
+                rayPos.z += step.z;
+                radiusNow = tMax.z;
+                tMax.z += tDelta.z;
+            }
+        }
+        else {
+            if(tMax.y < tMax.z) {
+                rayPos.y += step.y;
+                radiusNow = tMax.y;
+                tMax.y += tDelta.y;
+            }
+            else {
+                rayPos.z += step.z;
+                radiusNow = tMax.z;
+                tMax.z += tDelta.z;
+            }
+        }
     }
     
-    return false;
+	return false;
 }
 
 float Camera::getFov() {

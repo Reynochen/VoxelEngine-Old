@@ -25,7 +25,6 @@ Chunks::~Chunks() {
 }
 
 Voxel* Chunks::getVoxel(glm::vec3 pos) {
-    pos += glm::vec3(0.5f, 0.5f, 0.5f);
 	int cX = pos.x / CHUNK_W;
 	int cY = pos.y / CHUNK_H;
 	int cZ = pos.z / CHUNK_L;
@@ -33,12 +32,10 @@ Voxel* Chunks::getVoxel(glm::vec3 pos) {
 	if (pos.x < 0) cX--;
 	if (pos.y < 0) cY--;
 	if (pos.z < 0) cZ--;
-	if (cX < 0 || cY < 0 || cZ < 0 || cX >= w || cY >= h || cZ >= l)
-		return nullptr;
+	if (cX < 0 || cY < 0 || cZ < 0 || cX >= w || cY >= h || cZ >= l) return nullptr;
 
 	Chunk* chunk = chunks[(cY * l + cZ) * w + cX];
-	if (chunk == nullptr)
-		return nullptr;
+	if (chunk == nullptr) return nullptr;
     
 	int vX = pos.x - cX * CHUNK_W;
 	int vY = pos.y - cY * CHUNK_H;

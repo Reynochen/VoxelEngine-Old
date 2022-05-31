@@ -19,6 +19,18 @@
 
 #include "Camera.hpp"
 
+float vertices[] {
+    -0.01f, -0.01f,
+    0.01f, 0.01f,
+
+    -0.01f, 0.01f,
+    0.01f, -0.01f,
+};
+
+int att[] {
+    2, 0
+};
+
 int main() {
     
     Window::initialization(800, 600, "Voxel Engine", 0);
@@ -55,6 +67,8 @@ int main() {
         }
         meshes[i] = renderer.render(chunk, closes);
     }
+    Mesh* crosshair = new Mesh(vertices, 4, att);
+    Shader* crosshairShader = loadShader("../res/Shaders/crosshairShader.vs", "../res/Shaders/crosshairShader.fs");
 
     Shader* shader = loadShader("../res/Shaders/main.vs", "../res/Shaders/main.fs");
     Texture* texture = loadTexture("../res/Textures/atlas.png");
@@ -69,14 +83,12 @@ int main() {
     glClearColor(0.1f, 0.4f, 0.5f, 1.0f);
     
     while(!Window::ShouldClose()) {
-
         camera.update();
         projection = glm::perspective(glm::radians(camera.getFov()), (float)Window::getWidth() / (float)Window::getHeight(), 0.01f, 1024.0f);
         view = camera.getMatrix();
 
         if(Events::jpressed(GLFW_KEY_ESCAPE))
             Window::ShouldClose(true);
-
 
         if(Events::jclicked(GLFW_MOUSE_BUTTON_LEFT)) {
             camera.rayCast(chunks);
@@ -123,6 +135,8 @@ int main() {
             mesh->draw(GL_TRIANGLES);
         }
 
+        crosshairShader->use();
+        crosshair->draw(GL_LINES);
         Window::swapBuffers();
         Events::pullEvents();
     }
@@ -133,6 +147,8 @@ int main() {
         delete meshes[i];
     delete[] meshes;
     delete chunks;   
+    delete crosshairShader;
+    delete crosshair;
 
     Window::terminate();
     return 0;
