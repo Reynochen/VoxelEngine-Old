@@ -11,6 +11,8 @@
 
 class Chunk {
 public:
+    bool modified = false;
+
     int x,y,z;
     Voxel* voxels;
     Chunk(int x, int y, int z);

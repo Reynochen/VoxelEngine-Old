@@ -37,8 +37,8 @@ public:
 
     float getFov();
     glm::mat4 getMatrix();
-
-    bool rayCast(Chunks* chunks, int radius = 5);
+    glm::vec3 getPos();
+    glm::vec3 getFront();
 };
 
 #endif

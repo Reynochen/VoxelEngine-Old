@@ -44,6 +44,9 @@ int Window::initialization(int width, int height, const char* title, unsigned sh
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+
     Window::fpsLock = fpsLock;
 
     return 0;
