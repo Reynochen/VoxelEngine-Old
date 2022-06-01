@@ -24,7 +24,7 @@ Camera::Camera( glm::vec3 pos, glm::vec3 worldUp, float fov, float sensitivity, 
 //https://gamedev.stackexchange.com/questions/47362/cast-ray-to-select-block-in-voxel-game?rq=1
 //Õ¿ ŒÕ≈÷ “Œ ŒÕŒ –¿¡Œ“¿≈“
 bool Camera::rayCast(Chunks* chunks, int radius) {
-    glm::vec3 startPos(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5);
+    glm::vec3 startPos(pos.x, pos.y, pos.z);
 
     glm::vec3 rayPos(startPos);
     glm::vec3 dir = front;

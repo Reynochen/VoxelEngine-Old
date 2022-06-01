@@ -129,8 +129,8 @@ int main() {
         for(int i = 0; i < chunks->volume; i++) {
             Chunk* chunk = chunks->chunks[i];
             Mesh* mesh = meshes[i];
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(chunk->x * CHUNK_W, chunk->y * CHUNK_H, chunk->z * CHUNK_L));
+
+            model = glm::translate(glm::mat4(1.0f), glm::vec3(chunk->x * CHUNK_W+0.5f, chunk->y * CHUNK_H+0.5f, chunk->z * CHUNK_L+0.5f));
             shader->setMatrix("model", model);
             mesh->draw(GL_TRIANGLES);
         }
